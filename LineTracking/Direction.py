@@ -2,8 +2,7 @@ import time
 import Adafruit_GPIO.SPI as SPI
 import Adafruit_MCP3008
 import Adafruit_PCA9685
-
-status = 0
+from Status import Status
 
 # Constants
 speed = 250
@@ -16,7 +15,6 @@ SPI_DEVICE = 0
 mcp = Adafruit_MCP3008.MCP3008(spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE))
 # Initialise the PCA9685 using the default address (0x40).
 pwm = Adafruit_PCA9685.PCA9685()
-
 
 def debug(): 
     values = [0]*8
@@ -146,29 +144,64 @@ def docking():
     else:
         straight()
         
-        
-        
-
-def sensorcheck():
-    return ((weight.sensor > weightthreshold) or timer())
-
-def movement():
-    if isEndOfTrack():
-        exit()
-    elif (left90() and sensorcheck()):
-        hardleft()
-        if (matchpattern('*****B**') == True):
-            status = 1
-            docking()        
-    elif right90(): 
-        # Kelvin: where would you encounter this condition?
-        hardright()
-    elif leftsensor(): 
+def normal_tracking():
+    if leftsensor(): 
         left()
     elif rightsensor():
         right()
     else:
         straight()
+        
+
+def sensorcheck():
+    return ((weight.sensor > weightthreshold) or timer())
+
+def movement(status):
+    new_status = status
+
+    # C1
+    if isEndOfTrack():
+        exit()
+
+    # C2
+    elif status == Status.NORMAL and left90() and sensorcheck():
+        hardleft()
+        new_status = Status.UNLOAD_SEQUENCE_STARTED
+
+    # C3: K
+    elif status == Status.UNLOAD_SEQUENCE_STARTED and matches_pattern('*****B**'):
+        new_status = Status.WAITING_TO_UNLOAD
+    
+    # C4
+    elif status == Status.WAITING_TO_UNLOAD and loadpattern():
+        still()
+        loweractuator()
+        time.sleep(5)
+        stopactuator()
+        new_status = Status.WAITING_TO_LOAD
+
+    # C5
+    elif status == Status.WAITING_TO_LOAD and loadpattern():
+        still()
+        increaseactuator()
+        time.delay(5)
+        stopactuator()
+        new_status = Status.WAITING_TO_MERGE
+
+    # C6
+    elif status == Status.WAITING_TO_MERGE and mergepattern():
+        # Do stuff to merge
+        new_status = Status.MERGING
+
+    # C7
+    elif status == Status.MERGING and right90():
+        new_status = Status.NORMAL
+
+    # D
+    elif status != Status.UNLOAD_SEQUENCE_STARTED and status != Status.MERGING:
+        normal_tracking()
+
+    return new_status
 
 def matches_pattern(pattern):
     # ========================================================
@@ -197,7 +230,3 @@ def matches_pattern(pattern):
             return False
 
     return True
-
-
-        
-

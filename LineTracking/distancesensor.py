@@ -3,8 +3,11 @@ import time
  
 GPIO.setmode(GPIO.BCM)
 
-TRIG1 = 18
-ECHO1 = 24
+TRIG1 = 16
+ECHO1 = 19
+ECHO2 = 20
+ECHO3 = 26
+ECHO4 = 21
 
 #print ("Distance Measurement In Process")
 GPIO.setup(TRIG1, GPIO.OUT)
