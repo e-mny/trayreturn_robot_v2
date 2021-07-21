@@ -96,8 +96,6 @@ def timer():
 
         
 # 7 is L, 0 is R
-
-
     
 # Direction = 0 is to lengthen actuator
 # Direction = 4095 is to lower actuator    
@@ -113,36 +111,6 @@ def increaseactuator():
 def stopactuator():
     pwm.set_pwm(4, 0, 0) # Speed Linear Actuator
     pwm.set_pwm(5, 0, 0) # Direction Linear Actuator
-    
-# Status:
-# 0 = normal
-# 1 = unload
-# 2 = reload
-# 3 = merge
-
-def docking(): 
-    # Main Station
-    # Kelvin: Why is there two load pattern? 
-    if loadpattern():
-        if status == 1: # Unloading
-            still()
-            loweractuator()
-            time.sleep(5)
-            stopactuator()
-            status = 2
-        elif status == 2: # Loading
-            still()
-            increaseactuator()
-            time.delay(5)
-            stopactuator()
-            status = 0
-            return None
-    elif leftsensor(): 
-        left()
-    elif rightsensor():
-        right()
-    else:
-        straight()
         
 def normal_tracking():
     if leftsensor(): 
@@ -156,52 +124,52 @@ def normal_tracking():
 def sensorcheck():
     return ((weight.sensor > weightthreshold) or timer())
 
-def movement(status):
-    new_status = status
+def movement(Status):
+    new_Status = Status
 
     # C1
     if isEndOfTrack():
         exit()
 
     # C2
-    elif status == Status.NORMAL and left90() and sensorcheck():
+    elif Status == Status.NORMAL and left90() and sensorcheck():
         hardleft()
-        new_status = Status.UNLOAD_SEQUENCE_STARTED
+        new_Status = Status.UNLOAD_SEQUENCE_STARTED
 
     # C3: K
-    elif status == Status.UNLOAD_SEQUENCE_STARTED and matches_pattern('*****B**'):
-        new_status = Status.WAITING_TO_UNLOAD
+    elif Status == Status.UNLOAD_SEQUENCE_STARTED and matches_pattern('*****B**'):
+        new_Status = Status.WAITING_TO_UNLOAD
     
     # C4
-    elif status == Status.WAITING_TO_UNLOAD and loadpattern():
+    elif Status == Status.WAITING_TO_UNLOAD and loadpattern():
         still()
         loweractuator()
         time.sleep(5)
         stopactuator()
-        new_status = Status.WAITING_TO_LOAD
+        new_Status = Status.WAITING_TO_LOAD
 
     # C5
-    elif status == Status.WAITING_TO_LOAD and loadpattern():
+    elif Status == Status.WAITING_TO_LOAD and loadpattern():
         still()
         increaseactuator()
         time.delay(5)
         stopactuator()
-        new_status = Status.WAITING_TO_MERGE
+        new_Status = Status.WAITING_TO_MERGE
 
     # C6
-    elif status == Status.WAITING_TO_MERGE and mergepattern():
+    elif Status == Status.WAITING_TO_MERGE and mergepattern():
         # Do stuff to merge
-        new_status = Status.MERGING
+        new_Status = Status.MERGING
 
     # C7
-    elif status == Status.MERGING and right90():
-        new_status = Status.NORMAL
+    elif Status == Status.MERGING and right90():
+        new_Status = Status.NORMAL
 
     # D
-    elif status != Status.UNLOAD_SEQUENCE_STARTED and status != Status.MERGING:
+    elif Status != Status.UNLOAD_SEQUENCE_STARTED and Status != Status.MERGING:
         normal_tracking()
 
-    return new_status
+    return new_Status
 
 def matches_pattern(pattern):
     # ========================================================
