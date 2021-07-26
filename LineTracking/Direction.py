@@ -3,11 +3,12 @@ import Adafruit_GPIO.SPI as SPI
 import Adafruit_MCP3008
 import Adafruit_PCA9685
 from Status import Status
+from WeightSensor import read_average
 
 # Constants
 speed = 250
 timethreshold = 600 # 10 mins
-weightthreshold = 4000
+weightthreshold = 820 # 2 trays
 
 # Hardware SPI configuration:
 SPI_PORT   = 0
@@ -64,18 +65,12 @@ def still():
     pwm.set_pwm(3, 0, 0) # Speed R
 
 def isEndOfTrack():
-    # Kelvin: Middle two sensors white? Will there be a chance that this condition
-    # is also satisfied when the robot is going straight? Perhaps detecting all 8
-    # sensors black would be a better idea?
-    return (matches_pattern('BBBBBBBB'))
+    return (matches_pattern('00000000'))
 
 def onTrack():
-    # Kelvin: 2nd from middle white, and 1st from middle black?
     return (matches_pattern('**0BB0**'))
 
-# Kelvin: left90 and leftsensor same pattern?
 def left90():
-    
     return (matches_pattern('BBBBB000'))
 
 def right90():
@@ -89,11 +84,13 @@ def rightsensor():
 
 def loadpattern():
     return (matches_pattern('BBB00BBB'))
+
+def mergepattern():
+    return (matches_pattern('BBBBBBBB'))
     
 def timer():
     time.sleep(timethreshold)
     return True
-
         
 # 7 is L, 0 is R
     
@@ -122,7 +119,7 @@ def normal_tracking():
         
 
 def sensorcheck():
-    return ((weight.sensor > weightthreshold) or timer())
+    return ((read_average > weightthreshold) or timer())
 
 def movement(Status):
     new_Status = Status
@@ -158,7 +155,7 @@ def movement(Status):
 
     # C6
     elif Status == Status.WAITING_TO_MERGE and mergepattern():
-        # Do stuff to merge
+        hardleft()
         new_Status = Status.MERGING
 
     # C7
