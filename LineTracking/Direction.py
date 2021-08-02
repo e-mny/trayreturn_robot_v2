@@ -3,7 +3,8 @@ import Adafruit_GPIO.SPI as SPI
 import Adafruit_MCP3008
 import Adafruit_PCA9685
 from Status import Status
-from WeightSensor import read_average
+from WeightSensor import HX711
+hx = HX711(5, 6, gain=128)
 
 # Constants
 speed = 250
@@ -119,7 +120,7 @@ def normal_tracking():
         
 
 def sensorcheck():
-    return ((read_average > weightthreshold) or timer())
+    return ((hx.read_average() > weightthreshold) or timer())
 
 def movement(Status):
     new_Status = Status

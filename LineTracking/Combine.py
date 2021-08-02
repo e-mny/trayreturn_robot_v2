@@ -4,7 +4,7 @@ from Status import Status
 import ProximitySensor
 from ProximitySensor import tooClose
 import time
-from WeightSensor import read_average
+from WeightSensor import HX711
 
 
 
