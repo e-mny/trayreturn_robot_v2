@@ -44,5 +44,5 @@ while True:
     # Move servo on channel O between extremes.
     pwm.set_pwm(0, 0, 0) # Direction L
     pwm.set_pwm(1, 0, speed) # Speed L
-    pwm.set_pwm(2, 0, 4095) # Direction R
+    pwm.set_pwm(2, 0, 0) # Direction R
     pwm.set_pwm(3, 0, speed) # Speed R

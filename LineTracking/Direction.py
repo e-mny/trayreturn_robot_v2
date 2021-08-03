@@ -4,10 +4,10 @@ import Adafruit_MCP3008
 import Adafruit_PCA9685
 from Status import Status
 from WeightSensor import HX711
-hx = HX711(5, 6, gain=128)
+hx = HX711(6, 5, 128)
 
 # Constants
-speed = 250
+speed = 1750
 timethreshold = 600 # 10 mins
 weightthreshold = 820 # 2 trays
 
@@ -66,16 +66,16 @@ def still():
     pwm.set_pwm(3, 0, 0) # Speed R
 
 def isEndOfTrack():
-    return (matches_pattern('00000000'))
+    return (matches_pattern('OOOOOOOO'))
 
 def onTrack():
-    return (matches_pattern('**0BB0**'))
+    return (matches_pattern('**OBBO**'))
 
 def left90():
-    return (matches_pattern('BBBBB000'))
+    return (matches_pattern('BBBBBOOO'))
 
 def right90():
-    return (matches_pattern('000BBBBB'))
+    return (matches_pattern('OOOBBBBB'))
 
 def leftsensor():
     return (matches_pattern('**B*****'))
@@ -84,7 +84,7 @@ def rightsensor():
     return (matches_pattern('*****B**'))
 
 def loadpattern():
-    return (matches_pattern('BBB00BBB'))
+    return (matches_pattern('BBBOOBBB'))
 
 def mergepattern():
     return (matches_pattern('BBBBBBBB'))
@@ -95,20 +95,20 @@ def timer():
         
 # 7 is L, 0 is R
     
-# Direction = 0 is to lengthen actuator
-# Direction = 4095 is to lower actuator    
+# Direction = 0 is to lower actuator
+# Direction = 4095 is to raise actuator    
 
 def loweractuator():
-    pwm.set_pwm(4, 0, speed) # Speed Linear Actuator
-    pwm.set_pwm(5, 0, 4095) # Direction Linear Actuator
+    pwm.set_pwm(4, 0, 0) # Direction Linear Actuator
+    pwm.set_pwm(5, 0, speed) # Speed Linear Actuator
     
 def increaseactuator():
-    pwm.set_pwm(4, 0, speed) # Speed Linear Actuator
-    pwm.set_pwm(5, 0, 0) # Direction Linear Actuator
+    pwm.set_pwm(4, 0, 4095) # Direction Linear Actuator
+    pwm.set_pwm(5, 0, speed) # Speed Linear Actuator
     
 def stopactuator():
-    pwm.set_pwm(4, 0, 0) # Speed Linear Actuator
-    pwm.set_pwm(5, 0, 0) # Direction Linear Actuator
+    pwm.set_pwm(4, 0, 0) # Direction Linear Actuator
+    pwm.set_pwm(5, 0, 0) # Speed Linear Actuator
         
 def normal_tracking():
     if leftsensor(): 
@@ -127,44 +127,51 @@ def movement(Status):
 
     # C1
     if isEndOfTrack():
-        exit()
+        print("C1")
+        #exit()
 
     # C2
     elif Status == Status.NORMAL and left90() and sensorcheck():
+        print("C2")
         hardleft()
         new_Status = Status.UNLOAD_SEQUENCE_STARTED
+        
 
-    # C3: K
+    # C3: 
     elif Status == Status.UNLOAD_SEQUENCE_STARTED and matches_pattern('*****B**'):
+        print("C3")
         new_Status = Status.WAITING_TO_UNLOAD
     
     # C4
     elif Status == Status.WAITING_TO_UNLOAD and loadpattern():
+        print("C4")
         still()
         loweractuator()
-        time.sleep(5)
-        stopactuator()
+        time.sleep(7)
         new_Status = Status.WAITING_TO_LOAD
 
     # C5
     elif Status == Status.WAITING_TO_LOAD and loadpattern():
+        print("C5")
         still()
         increaseactuator()
-        time.delay(5)
-        stopactuator()
+        time.delay(7)
         new_Status = Status.WAITING_TO_MERGE
 
     # C6
     elif Status == Status.WAITING_TO_MERGE and mergepattern():
+        print("C6")
         hardleft()
         new_Status = Status.MERGING
 
     # C7
     elif Status == Status.MERGING and right90():
+        print("C7")
         new_Status = Status.NORMAL
 
     # D
     elif Status != Status.UNLOAD_SEQUENCE_STARTED and Status != Status.MERGING:
+        print("D")
         normal_tracking()
 
     return new_Status
@@ -189,7 +196,7 @@ def matches_pattern(pattern):
     for i, p in enumerate(pattern):
         if p == '*':
             continue
-        elif (p == 'B' and (mcp.read_adc(i) < 600)):
+        elif (p == 'B' and (mcp.read_adc(i) < 800)):
             # If reading is white, return False because pattern does not match
             return False
         elif (p == 'O' and (mcp.read_adc(i) > 900)):

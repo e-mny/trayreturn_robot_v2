@@ -39,8 +39,8 @@ class HX711:
         GPIO.setmode(GPIO.BCM)
 
         # Set the pin numbers
-        self.PD_SCK = pd_sck
-        self.DOUT = dout
+        self.PD_SCK = dout
+        self.DOUT = pd_sck
 
         # Setup the GPIO Pin as output
         GPIO.setup(self.PD_SCK, GPIO.OUT)

@@ -25,7 +25,6 @@ import time
 import sys
 import numpy
 
-
 class HX711:
 
     def __init__(self, dout, pd_sck, gain=128):
@@ -38,16 +37,19 @@ class HX711:
         self.GAIN = 0
         self.OFFSET = 0
         self.SCALE = 1
+        self.lastVal = 0
+        GPIO.setwarnings(False)
 
         # Setup the gpio pin numbering system
         GPIO.setmode(GPIO.BCM)
 
         # Set the pin numbers
-        self.PD_SCK = pd_sck
-        self.DOUT = dout
+        self.PD_SCK = 5
+        self.DOUT = 6
 
         # Setup the GPIO Pin as output
         GPIO.setup(self.PD_SCK, GPIO.OUT)
+        
 
         # Setup the GPIO Pin as input
         GPIO.setup(self.DOUT, GPIO.IN)
@@ -107,7 +109,7 @@ class HX711:
         # Control if the chip is ready
         while not (GPIO.input(self.DOUT) == 0):
             # Uncommenting the print below results in noisy output
-            # print("No input from HX711.")
+            #print("No input from HX711.")
             pass
 
         # Original C source code ported to Python as described in datasheet

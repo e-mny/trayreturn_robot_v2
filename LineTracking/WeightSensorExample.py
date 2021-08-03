@@ -42,7 +42,7 @@ if sys.version_info[0] != 3:
 ############################################################################
 
 
-hx = HX711(5, 6)
+hx = HX711(5, 6, 128)
 
 
 def cleanAndExit():
@@ -56,8 +56,8 @@ def setup():
     """
     code run once
     """
-    hx.set_offset(8176722.125) # Change according to calibration.py
-    hx.set_scale(16.14980487804878) # Change according to calibration.py
+    hx.set_offset(8175602.375) # Change according to calibration.py
+    hx.set_scale(24.9804685365853658) # Change according to calibration.py
     # Increase scale to decrease reading
     # Decrease scale to increase reading
 

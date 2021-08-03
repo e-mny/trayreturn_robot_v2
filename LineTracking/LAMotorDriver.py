@@ -42,9 +42,14 @@ print('Moving servo on channel 0, press Ctrl-C to quit...')
 # State = 0 is short actuator
 # State = 1 is long actuator
 while True:
-    # Direction = 0 is to lengthen actuator
-    # Direction = 4095 is to lower actuator
+    # Direction = 0 is to lower actuator
+    # Direction = 4095 is to raise actuator
 
-    pwm.set_pwm(4, 0, speed) # Speed Linear Actuator
-    pwm.set_pwm(5, 0, 0) # Direction Linear Actuator
+    pwm.set_pwm(4, 0, 0) # Direction Linear Actuator
+    pwm.set_pwm(5, 0, 4095) # Speed Linear Actuator
+    time.sleep(5)
+    pwm.set_pwm(4, 0, 4095) # Direction Linear Actuator
+    pwm.set_pwm(5, 0, 4095) # Speed Linear Actuator
+    time.sleep(5)
+
 
