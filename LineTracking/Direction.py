@@ -7,7 +7,7 @@ from WeightSensor import HX711
 hx = HX711(6, 5, 128)
 
 # Constants
-speed = 1750
+speed = 750
 timethreshold = 600 # 10 mins
 weightthreshold = 820 # 2 trays
 
@@ -49,7 +49,7 @@ def right():
 
 def hardright():
     pwm.set_pwm(0, 0, 0) # Direction L
-    pwm.set_pwm(1, 0, 1000) # Speed L
+    pwm.set_pwm(1, 0, speed) # Speed L
     pwm.set_pwm(2, 0, 4095) # Direction R
     pwm.set_pwm(3, 0, 1000) # Speed R
     
@@ -78,10 +78,10 @@ def right90():
     return (matches_pattern('OOOBBBBB'))
 
 def leftsensor():
-    return (matches_pattern('**B*****'))
+    return (matches_pattern('*B******'))
 
 def rightsensor():
-    return (matches_pattern('*****B**'))
+    return (matches_pattern('******B*'))
 
 def loadpattern():
     return (matches_pattern('BBBOOBBB'))
@@ -112,11 +112,14 @@ def stopactuator():
         
 def normal_tracking():
     if leftsensor(): 
-        left()
-    elif rightsensor():
         right()
+        print("Right")
+    elif rightsensor():
+        left()
+        print("Left")
     else:
         straight()
+        print("Straight")
         
 
 def sensorcheck():
@@ -131,9 +134,9 @@ def movement(Status):
         #exit()
 
     # C2
-    elif Status == Status.NORMAL and left90() and sensorcheck():
+    elif Status == Status.NORMAL and right90() and sensorcheck():
         print("C2")
-        hardleft()
+        hardright()
         new_Status = Status.UNLOAD_SEQUENCE_STARTED
         
 
@@ -161,7 +164,7 @@ def movement(Status):
     # C6
     elif Status == Status.WAITING_TO_MERGE and mergepattern():
         print("C6")
-        hardleft()
+        hardright()
         new_Status = Status.MERGING
 
     # C7
@@ -196,10 +199,10 @@ def matches_pattern(pattern):
     for i, p in enumerate(pattern):
         if p == '*':
             continue
-        elif (p == 'B' and (mcp.read_adc(i) < 800)):
+        elif (p == 'B' and (mcp.read_adc(i) < 1000)):
             # If reading is white, return False because pattern does not match
             return False
-        elif (p == 'O' and (mcp.read_adc(i) > 900)):
+        elif (p == 'O' and (mcp.read_adc(i) > 1000)):
             return False
 
     return True

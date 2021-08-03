@@ -23,7 +23,6 @@ try:
             #else:
             debug()
             Status = movement(Status)
-            print("Running")
 
 except KeyboardInterrupt:
     print("KeyboardInterrupt")
