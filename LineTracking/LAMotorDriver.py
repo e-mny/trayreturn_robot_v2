@@ -46,10 +46,13 @@ while True:
     # Direction = 4095 is to raise actuator
 
     pwm.set_pwm(4, 0, 0) # Direction Linear Actuator
-    pwm.set_pwm(5, 0, 4095) # Speed Linear Actuator
-    time.sleep(5)
+    pwm.set_pwm(5, 0, 2047) # Speed Linear Actuator
+    time.sleep(2.5)
+    pwm.set_pwm(4, 0, 0) # Direction Linear Actuator
+    pwm.set_pwm(5, 0, 0) # Speed Linear Actuator
+    time.sleep(2.5)
     pwm.set_pwm(4, 0, 4095) # Direction Linear Actuator
-    pwm.set_pwm(5, 0, 4095) # Speed Linear Actuator
+    pwm.set_pwm(5, 0, 2047) # Speed Linear Actuator
     time.sleep(5)
 
 

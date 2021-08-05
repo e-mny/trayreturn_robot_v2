@@ -7,7 +7,7 @@ from WeightSensor import HX711
 hx = HX711(6, 5, 128)
 
 # Constants
-speed = 750
+speed = 700
 timethreshold = 600 # 10 mins
 weightthreshold = 820 # 2 trays
 
@@ -26,24 +26,24 @@ def debug():
     # Print the ADC values.
     print('| {0:>4} | {1:>4} | {2:>4} | {3:>4} | {4:>4} | {5:>4} | {6:>4} | {7:>4} |'.format(*values))
     # Pause for half a second.
-    time.sleep(0.5)
+    #time.sleep(0.1)
 
 
 def left():
     pwm.set_pwm(0, 0, 0) # Direction L
     pwm.set_pwm(1, 0, 0) # Speed L
     pwm.set_pwm(2, 0, 0) # Direction R
-    pwm.set_pwm(3, 0, speed) # Speed R
+    pwm.set_pwm(3, 0, speed + 100) # Speed R
 
 def hardleft():
     pwm.set_pwm(0, 0, 4095) # Direction L
-    pwm.set_pwm(1, 0, 1000) # Speed L
+    pwm.set_pwm(1, 0, speed) # Speed L
     pwm.set_pwm(2, 0, 0) # Direction R
-    pwm.set_pwm(3, 0, 1000) # Speed R
+    pwm.set_pwm(3, 0, speed) # Speed R
 
 def right():
     pwm.set_pwm(0, 0, 0) # Direction L
-    pwm.set_pwm(1, 0, speed) # Speed L
+    pwm.set_pwm(1, 0, speed + 100) # Speed L
     pwm.set_pwm(2, 0, 0) # Direction R
     pwm.set_pwm(3, 0, 0) # Speed R
 
@@ -51,7 +51,7 @@ def hardright():
     pwm.set_pwm(0, 0, 0) # Direction L
     pwm.set_pwm(1, 0, speed) # Speed L
     pwm.set_pwm(2, 0, 4095) # Direction R
-    pwm.set_pwm(3, 0, 1000) # Speed R
+    pwm.set_pwm(3, 0, speed) # Speed R
     
 def straight():
     pwm.set_pwm(0, 0, 0) # Direction L
@@ -69,7 +69,7 @@ def isEndOfTrack():
     return (matches_pattern('OOOOOOOO'))
 
 def onTrack():
-    return (matches_pattern('**OBBO**'))
+    return (matches_pattern('OO*BB*OO'))
 
 def left90():
     return (matches_pattern('BBBBBOOO'))
@@ -78,10 +78,10 @@ def right90():
     return (matches_pattern('OOOBBBBB'))
 
 def leftsensor():
-    return (matches_pattern('*B******'))
+    return (matches_pattern('*BB*OOOO'))
 
 def rightsensor():
-    return (matches_pattern('******B*'))
+    return (matches_pattern('OOOO*BB*'))
 
 def loadpattern():
     return (matches_pattern('BBBOOBBB'))
@@ -123,7 +123,8 @@ def normal_tracking():
         
 
 def sensorcheck():
-    return ((hx.read_average() > weightthreshold) or timer())
+    return True
+    #((hx.read_average() > weightthreshold) or timer())
 
 def movement(Status):
     new_Status = Status
@@ -131,6 +132,8 @@ def movement(Status):
     # C1
     if isEndOfTrack():
         print("C1")
+        still()
+        left()
         #exit()
 
     # C2
@@ -199,10 +202,10 @@ def matches_pattern(pattern):
     for i, p in enumerate(pattern):
         if p == '*':
             continue
-        elif (p == 'B' and (mcp.read_adc(i) < 1000)):
+        elif (p == 'B' and (mcp.read_adc(i) != 1023)):
             # If reading is white, return False because pattern does not match
             return False
-        elif (p == 'O' and (mcp.read_adc(i) > 1000)):
+        elif (p == 'O' and (mcp.read_adc(i) == 1023)):
             return False
 
     return True

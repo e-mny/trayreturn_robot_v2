@@ -8,7 +8,8 @@ import time
 
 
 
-try: 
+try:
+    time.sleep(1) # 1s delay before it starts 
     while True: 
         if __name__ == "__main__":
             x = 0
@@ -23,6 +24,7 @@ try:
             #else:
             debug()
             Status = movement(Status)
+        
 
 except KeyboardInterrupt:
     print("KeyboardInterrupt")
