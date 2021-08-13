@@ -4,7 +4,7 @@ import adafruit_hcsr04
 import RPi.GPIO as GPIO
 
 # Constants
-proximity = 55
+proximity = 20
 
 frontsonar = adafruit_hcsr04.HCSR04(trigger_pin=board.D1, echo_pin=board.D19)
 backsonar = adafruit_hcsr04.HCSR04(trigger_pin=board.D12, echo_pin=board.D20)

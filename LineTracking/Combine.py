@@ -8,22 +8,23 @@ import time
 
 
 
+
+status = Status.NORMAL
 try:
     time.sleep(1) # 1s delay before it starts 
     while True: 
         if __name__ == "__main__":
             x = 0
-            Status = Status.NORMAL
             t = 300
             
-            #if (tooClose() == True):
-                #still()
-                #print("Someone is nearby")
-                #time.sleep(3) # Delay 3s until it checks surroundings again
+            # if tooClose():
+            #     still()
+            #     print("Someone is nearby")
+            #     time.sleep(3) # Delay 3s until it checks surroundings again
                 
-            #else:
+            # else:
             debug()
-            Status = movement(Status)
+            status = movement(status)
         
 
 except KeyboardInterrupt:

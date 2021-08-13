@@ -7,7 +7,7 @@ from WeightSensor import HX711
 hx = HX711(6, 5, 128)
 
 # Constants
-speed = 700
+speed = 1000
 timethreshold = 600 # 10 mins
 weightthreshold = 820 # 2 trays
 
@@ -69,19 +69,21 @@ def isEndOfTrack():
     return (matches_pattern('OOOOOOOO'))
 
 def onTrack():
-    return (matches_pattern('OO*BB*OO'))
+    return (matches_pattern('OOOBBOOO'))
 
 def left90():
-    return (matches_pattern('BBBBBOOO'))
+    return (matches_pattern('***BBBBB'))
 
 def right90():
-    return (matches_pattern('OOOBBBBB'))
+    return (matches_pattern('BBBBB***'))
 
 def leftsensor():
-    return (matches_pattern('*BB*OOOO'))
+    return (matches_pattern('******B*'))
+    # return (matches_pattern('OOO*BB**'))
 
 def rightsensor():
-    return (matches_pattern('OOOO*BB*'))
+    return (matches_pattern('*B******'))
+    # return (matches_pattern('**BB*OOO'))
 
 def loadpattern():
     return (matches_pattern('BBBOOBBB'))
@@ -111,12 +113,14 @@ def stopactuator():
     pwm.set_pwm(5, 0, 0) # Speed Linear Actuator
         
 def normal_tracking():
-    if leftsensor(): 
+    if rightsensor(): 
         right()
         print("Right")
-    elif rightsensor():
+        
+    elif leftsensor():
         left()
         print("Left")
+        
     else:
         straight()
         print("Straight")
@@ -126,61 +130,84 @@ def sensorcheck():
     return True
     #((hx.read_average() > weightthreshold) or timer())
 
-def movement(Status):
-    new_Status = Status
+def movement(status):
+    new_status = status
 
-    # C1
-    if isEndOfTrack():
-        print("C1")
-        still()
-        left()
-        #exit()
 
     # C2
-    elif Status == Status.NORMAL and right90() and sensorcheck():
+    if status == Status.NORMAL and right90() and sensorcheck():
         print("C2")
+        straight()
+        time.sleep(10) # Change if change speed
         hardright()
-        new_Status = Status.UNLOAD_SEQUENCE_STARTED
+        time.sleep(3) # Change if change speed
+        new_status = Status.UNLOAD_SEQUENCE_STARTED
         
 
     # C3: 
-    elif Status == Status.UNLOAD_SEQUENCE_STARTED and matches_pattern('*****B**'):
-        print("C3")
-        new_Status = Status.WAITING_TO_UNLOAD
+    elif status == Status.UNLOAD_SEQUENCE_STARTED:
+        while not matches_pattern('*****B**'):
+            hardright()
+            print("C3")
+        new_status = Status.WAITING_TO_UNLOAD
     
     # C4
-    elif Status == Status.WAITING_TO_UNLOAD and loadpattern():
-        print("C4")
-        still()
-        loweractuator()
-        time.sleep(7)
-        new_Status = Status.WAITING_TO_LOAD
+    elif status == Status.WAITING_TO_UNLOAD:
+        if loadpattern():
+            print("C4")
+            still()
+            loweractuator()
+            time.sleep(7)
+            normal_tracking()
+            time.sleep(1)
+            new_status = Status.WAITING_TO_LOAD
+        else:
+            normal_tracking()
+        
 
     # C5
-    elif Status == Status.WAITING_TO_LOAD and loadpattern():
-        print("C5")
-        still()
-        increaseactuator()
-        time.delay(7)
-        new_Status = Status.WAITING_TO_MERGE
+    elif status == Status.WAITING_TO_LOAD:
+        if loadpattern():
+            print("C5")
+            still()
+            increaseactuator()
+            time.sleep(7)
+            new_status = Status.WAITING_TO_MERGE
+        else:
+            normal_tracking()
 
     # C6
-    elif Status == Status.WAITING_TO_MERGE and mergepattern():
-        print("C6")
-        hardright()
-        new_Status = Status.MERGING
+    elif status == Status.WAITING_TO_MERGE:
+        if mergepattern():
+            print("C6")
+            straight()
+            time.sleep(10)
+            hardright()
+            time.sleep(3)
+            new_status = Status.MERGING
+        else:
+            normal_tracking()
 
     # C7
-    elif Status == Status.MERGING and right90():
-        print("C7")
-        new_Status = Status.NORMAL
+    elif status == Status.MERGING:
+        while not matches_pattern('**B*****'):
+            hardright()
+            print("C7")
+        new_status = Status.NORMAL
 
     # D
-    elif Status != Status.UNLOAD_SEQUENCE_STARTED and Status != Status.MERGING:
+    elif isEndOfTrack() and status == Status.NORMAL:
         print("D")
+        still()
+        hardleft()
+        #exit()
+
+    # Else
+    else: # Status != Status.UNLOAD_SEQUENCE_STARTED and status != Status.MERGING:
+        print("Else")
         normal_tracking()
 
-    return new_Status
+    return new_status
 
 def matches_pattern(pattern):
     # ========================================================
@@ -202,10 +229,10 @@ def matches_pattern(pattern):
     for i, p in enumerate(pattern):
         if p == '*':
             continue
-        elif (p == 'B' and (mcp.read_adc(i) != 1023)):
+        elif (p == 'B' and (mcp.read_adc(i) < 600)):
             # If reading is white, return False because pattern does not match
             return False
-        elif (p == 'O' and (mcp.read_adc(i) == 1023)):
+        elif (p == 'O' and (mcp.read_adc(i) > 600)):
             return False
 
     return True
