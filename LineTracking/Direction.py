@@ -7,7 +7,7 @@ from WeightSensor import HX711
 hx = HX711(6, 5, 128)
 
 # Constants
-speed = 1000
+speed = 800
 timethreshold = 600 # 10 mins
 weightthreshold = 820 # 2 trays
 
@@ -33,25 +33,25 @@ def left():
     pwm.set_pwm(0, 0, 0) # Direction L
     pwm.set_pwm(1, 0, 0) # Speed L
     pwm.set_pwm(2, 0, 0) # Direction R
-    pwm.set_pwm(3, 0, speed + 100) # Speed R
+    pwm.set_pwm(3, 0, speed - 200) # Speed R
 
 def hardleft():
     pwm.set_pwm(0, 0, 4095) # Direction L
-    pwm.set_pwm(1, 0, speed) # Speed L
+    pwm.set_pwm(1, 0, speed - 100) # Speed L
     pwm.set_pwm(2, 0, 0) # Direction R
-    pwm.set_pwm(3, 0, speed) # Speed R
+    pwm.set_pwm(3, 0, speed - 100) # Speed R
 
 def right():
     pwm.set_pwm(0, 0, 0) # Direction L
-    pwm.set_pwm(1, 0, speed + 100) # Speed L
+    pwm.set_pwm(1, 0, speed - 200) # Speed L
     pwm.set_pwm(2, 0, 0) # Direction R
     pwm.set_pwm(3, 0, 0) # Speed R
 
 def hardright():
     pwm.set_pwm(0, 0, 0) # Direction L
-    pwm.set_pwm(1, 0, speed) # Speed L
+    pwm.set_pwm(1, 0, speed - 100) # Speed L
     pwm.set_pwm(2, 0, 4095) # Direction R
-    pwm.set_pwm(3, 0, speed) # Speed R
+    pwm.set_pwm(3, 0, speed - 100) # Speed R
     
 def straight():
     pwm.set_pwm(0, 0, 0) # Direction L
@@ -72,10 +72,10 @@ def onTrack():
     return (matches_pattern('OOOBBOOO'))
 
 def left90():
-    return (matches_pattern('***BBBBB'))
+    return (matches_pattern('O**BBBBB'))
 
 def right90():
-    return (matches_pattern('BBBBB***'))
+    return (matches_pattern('BBBBB**O'))
 
 def leftsensor():
     return (matches_pattern('******B*'))
@@ -86,7 +86,7 @@ def rightsensor():
     # return (matches_pattern('**BB*OOO'))
 
 def loadpattern():
-    return (matches_pattern('BBBOOBBB'))
+    return (matches_pattern('BB*OO*BB'))
 
 def mergepattern():
     return (matches_pattern('BBBBBBBB'))
@@ -138,7 +138,7 @@ def movement(status):
     if status == Status.NORMAL and right90() and sensorcheck():
         print("C2")
         straight()
-        time.sleep(10) # Change if change speed
+        time.sleep(4) # Change if change speed
         hardright()
         time.sleep(3) # Change if change speed
         new_status = Status.UNLOAD_SEQUENCE_STARTED
@@ -155,11 +155,14 @@ def movement(status):
     elif status == Status.WAITING_TO_UNLOAD:
         if loadpattern():
             print("C4")
+            straight()
+            time.sleep(0.5)
             still()
             loweractuator()
-            time.sleep(7)
-            normal_tracking()
-            time.sleep(1)
+            time.sleep(12)
+            # left()
+            # time.sleep(0.5)
+            
             new_status = Status.WAITING_TO_LOAD
         else:
             normal_tracking()
@@ -169,9 +172,13 @@ def movement(status):
     elif status == Status.WAITING_TO_LOAD:
         if loadpattern():
             print("C5")
+            straight()
+            time.sleep(0.5)
             still()
             increaseactuator()
-            time.sleep(7)
+            time.sleep(12)
+            
+    
             new_status = Status.WAITING_TO_MERGE
         else:
             normal_tracking()
@@ -181,9 +188,9 @@ def movement(status):
         if mergepattern():
             print("C6")
             straight()
-            time.sleep(10)
+            time.sleep(4) # Change if change speed
             hardright()
-            time.sleep(3)
+            time.sleep(3) # Change if change speed
             new_status = Status.MERGING
         else:
             normal_tracking()
@@ -195,12 +202,12 @@ def movement(status):
             print("C7")
         new_status = Status.NORMAL
 
-    # D
-    elif isEndOfTrack() and status == Status.NORMAL:
-        print("D")
-        still()
-        hardleft()
-        #exit()
+    # # D
+    # elif isEndOfTrack() and status == Status.NORMAL:
+    #     print("D")
+    #     still()
+    #     hardleft()
+    #     #exit()
 
     # Else
     else: # Status != Status.UNLOAD_SEQUENCE_STARTED and status != Status.MERGING:
@@ -229,10 +236,10 @@ def matches_pattern(pattern):
     for i, p in enumerate(pattern):
         if p == '*':
             continue
-        elif (p == 'B' and (mcp.read_adc(i) < 600)):
+        elif (p == 'B' and (mcp.read_adc(i) < 950)):
             # If reading is white, return False because pattern does not match
             return False
-        elif (p == 'O' and (mcp.read_adc(i) > 600)):
+        elif (p == 'O' and (mcp.read_adc(i) > 950)):
             return False
 
     return True

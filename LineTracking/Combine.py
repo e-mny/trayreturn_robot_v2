@@ -9,7 +9,7 @@ import time
 
 
 
-status = Status.NORMAL
+status = Status.WAITING_TO_UNLOAD
 try:
     time.sleep(1) # 1s delay before it starts 
     while True: 
