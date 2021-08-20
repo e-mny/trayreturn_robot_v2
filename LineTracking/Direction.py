@@ -40,9 +40,9 @@ def left(factor):
 
 def hardleft():
     pwm.set_pwm(0, 0, 4095) # Direction L
-    pwm.set_pwm(1, 0, speed - 100) # Speed L
+    pwm.set_pwm(1, 0, speed - 300) # Speed L
     pwm.set_pwm(2, 0, 0) # Direction R
-    pwm.set_pwm(3, 0, speed - 100) # Speed R
+    pwm.set_pwm(3, 0, speed - 300) # Speed R
 
 def right(factor):
     pwm.set_pwm(0, 0, 0) # Direction L
@@ -54,9 +54,9 @@ def right(factor):
 
 def hardright():
     pwm.set_pwm(0, 0, 0) # Direction L
-    pwm.set_pwm(1, 0, speed - 100) # Speed L
+    pwm.set_pwm(1, 0, speed - 300) # Speed L
     pwm.set_pwm(2, 0, 4095) # Direction R
-    pwm.set_pwm(3, 0, speed - 100) # Speed R
+    pwm.set_pwm(3, 0, speed - 300) # Speed R
     
 def straight():
     pwm.set_pwm(0, 0, 0) # Direction L
@@ -111,8 +111,8 @@ def mergepattern():
     return (matches_pattern('BBBBBBBB'))
     
 def timer():
-    time.sleep(timethreshold)
-    return True
+    # time.sleep(timethreshold)
+    return False
         
 # 7 is L, 0 is R
     
@@ -136,13 +136,13 @@ def normal_tracking():
     ls = leftsensor()
     if rs is not False:
         right(rs)
-        print("right")
+        # print("right")
     elif ls is not False:
         left(ls)
-        print("left")
+        # print("left")
     else:
         straight()
-        print("straight")
+        # print("straight")
         
     # if rightsensor(): 
     #     right()
@@ -158,8 +158,10 @@ def normal_tracking():
         
 
 def sensorcheck():
-    return True
-    #((hx.read_average() > weightthreshold) or timer())
+    still()
+    print("Average: ", round(hx.read_average()))
+    return False
+    # return ((hx.read_average() > weightthreshold) or timer())
 
 def movement(status):
     new_status = status
