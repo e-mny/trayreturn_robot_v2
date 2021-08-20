@@ -9,22 +9,20 @@ import time
 
 
 
-status = Status.WAITING_TO_UNLOAD
+status = Status.NORMAL
 try:
     time.sleep(1) # 1s delay before it starts 
-    while True: 
-        if __name__ == "__main__":
-            x = 0
-            t = 300
-            
-            # if tooClose():
-            #     still()
-            #     print("Someone is nearby")
-            #     time.sleep(3) # Delay 3s until it checks surroundings again
-                
-            # else:
-            debug()
-            status = movement(status)
+    while (True): 
+        if tooClose():
+                still()
+                print("Someone is nearby")
+                time.sleep(2) # Delay 3s until it checks surroundings again
+        else:
+            if __name__ == "__main__":
+                x = 0
+                t = 300
+                debug()
+                status = movement(status)
         
 
 except KeyboardInterrupt:
@@ -34,6 +32,7 @@ except KeyboardInterrupt:
 finally:
     GPIO.cleanup()
     print("\nCleaning up!!")
+    print("Current Status: ", status)
     quit()
 
             

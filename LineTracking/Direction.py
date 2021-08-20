@@ -7,7 +7,7 @@ from WeightSensor import HX711
 hx = HX711(6, 5, 128)
 
 # Constants
-speed = 800
+speed = 1300
 timethreshold = 600 # 10 mins
 weightthreshold = 820 # 2 trays
 
@@ -28,12 +28,15 @@ def debug():
     # Pause for half a second.
     #time.sleep(0.1)
 
+speed_diff = int(.35 * speed)
 
-def left():
+def left(factor):
     pwm.set_pwm(0, 0, 0) # Direction L
-    pwm.set_pwm(1, 0, 0) # Speed L
+    # pwm.set_pwm(1, 0, 0) # Speed L
+    pwm.set_pwm(1, 0, speed - int(speed_diff * factor))
     pwm.set_pwm(2, 0, 0) # Direction R
-    pwm.set_pwm(3, 0, speed - 200) # Speed R
+    # pwm.set_pwm(3, 0, speed - 200) # Speed R
+    pwm.set_pwm(3, 0, speed + int(speed_diff * factor))
 
 def hardleft():
     pwm.set_pwm(0, 0, 4095) # Direction L
@@ -41,11 +44,13 @@ def hardleft():
     pwm.set_pwm(2, 0, 0) # Direction R
     pwm.set_pwm(3, 0, speed - 100) # Speed R
 
-def right():
+def right(factor):
     pwm.set_pwm(0, 0, 0) # Direction L
-    pwm.set_pwm(1, 0, speed - 200) # Speed L
+    # pwm.set_pwm(1, 0, speed - 200) # Speed L
+    pwm.set_pwm(1, 0, speed + int(speed_diff * factor))
     pwm.set_pwm(2, 0, 0) # Direction R
-    pwm.set_pwm(3, 0, 0) # Speed R
+    # pwm.set_pwm(3, 0, 0) # Speed R
+    pwm.set_pwm(3, 0, speed - int(speed_diff * factor))
 
 def hardright():
     pwm.set_pwm(0, 0, 0) # Direction L
@@ -69,7 +74,7 @@ def isEndOfTrack():
     return (matches_pattern('OOOOOOOO'))
 
 def onTrack():
-    return (matches_pattern('OOOBBOOO'))
+    return (matches_pattern('OO*BB*OO'))
 
 def left90():
     return (matches_pattern('O**BBBBB'))
@@ -78,11 +83,25 @@ def right90():
     return (matches_pattern('BBBBB**O'))
 
 def leftsensor():
-    return (matches_pattern('******B*'))
+    if matches_pattern('*****B**'):
+        return 1
+    elif matches_pattern('******B*'):
+        return 1.5
+    elif matches_pattern('*******B'):
+        return 2
+    else:
+        return False
+    # return (matches_pattern('******B*') or matches_pattern('*******B'))
     # return (matches_pattern('OOO*BB**'))
 
 def rightsensor():
-    return (matches_pattern('*B******'))
+    if matches_pattern('*B******'):
+        return 1
+    elif matches_pattern('B*******'):
+        return 1
+    else:
+        return False
+    # return (matches_pattern('*B******') or matches_pattern('B*******'))
     # return (matches_pattern('**BB*OOO'))
 
 def loadpattern():
@@ -113,17 +132,29 @@ def stopactuator():
     pwm.set_pwm(5, 0, 0) # Speed Linear Actuator
         
 def normal_tracking():
-    if rightsensor(): 
-        right()
-        print("Right")
-        
-    elif leftsensor():
-        left()
-        print("Left")
-        
+    rs = rightsensor()
+    ls = leftsensor()
+    if rs is not False:
+        right(rs)
+        print("right")
+    elif ls is not False:
+        left(ls)
+        print("left")
     else:
         straight()
-        print("Straight")
+        print("straight")
+        
+    # if rightsensor(): 
+    #     right()
+    #     print("Right")
+        
+    # elif leftsensor():
+    #     left()
+    #     print("Left")
+        
+    # else:
+    #     straight()
+    #     print("Straight")
         
 
 def sensorcheck():
@@ -133,14 +164,20 @@ def sensorcheck():
 def movement(status):
     new_status = status
 
+    # C1
+    if status == Status.NORMAL and right90() and (sensorcheck() == False):
+        print("C1")
+        straight()
+        time.sleep(1) # Change if change speed
+        
 
     # C2
-    if status == Status.NORMAL and right90() and sensorcheck():
+    if status == Status.NORMAL and right90() and (sensorcheck() == True):
         print("C2")
         straight()
-        time.sleep(4) # Change if change speed
-        hardright()
         time.sleep(3) # Change if change speed
+        hardright()
+        time.sleep(2) # Change if change speed
         new_status = Status.UNLOAD_SEQUENCE_STARTED
         
 
@@ -188,9 +225,9 @@ def movement(status):
         if mergepattern():
             print("C6")
             straight()
-            time.sleep(4) # Change if change speed
-            hardright()
             time.sleep(3) # Change if change speed
+            hardright()
+            time.sleep(2) # Change if change speed
             new_status = Status.MERGING
         else:
             normal_tracking()

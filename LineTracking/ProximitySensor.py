@@ -4,7 +4,7 @@ import adafruit_hcsr04
 import RPi.GPIO as GPIO
 
 # Constants
-proximity = 20
+proximity = 40
 
 frontsonar = adafruit_hcsr04.HCSR04(trigger_pin=board.D1, echo_pin=board.D19)
 backsonar = adafruit_hcsr04.HCSR04(trigger_pin=board.D12, echo_pin=board.D20)
@@ -18,12 +18,14 @@ def tooClose():
         return False # Continue moving
 
 
-# try:
-    print("F: ", round(frontsonar.distance, 5))
-    print("B: ", round(backsonar.distance, 5))
-    print("L: ", round(leftsonar.distance, 5))
-    print("R: ", round(rightsonar.distance, 5))
-    print("-----------------------")
-#except RuntimeError:
-    print("Retrying!")
-#time.sleep(2)
+
+while True:
+    try:
+        print("F: ", round(frontsonar.distance, 5))
+        print("B: ", round(backsonar.distance, 5))
+        print("L: ", round(leftsonar.distance, 5))
+        print("R: ", round(rightsonar.distance, 5))
+        print("-----------------------")
+    except RuntimeError:
+        print("Retrying!")
+    time.sleep(2)
