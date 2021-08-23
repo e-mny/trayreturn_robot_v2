@@ -56,8 +56,8 @@ def setup():
     """
     code run once
     """
-    hx.set_offset(8400773.625) # Change according to calibration.py
-    hx.set_scale(24.578048780487805) # Change according to calibration.py
+    hx.set_offset(8169755.3125) # Change according to calibration.py
+    hx.set_scale(384.3488095238095) # Change according to calibration.py
     # Increase scale to decrease reading
     # Decrease scale to increase reading
 
@@ -85,8 +85,8 @@ def loop():
 
 ##################################
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
 
-#     setup()
-#     while True:
-#         loop()
+    setup()
+    while True:
+        loop()

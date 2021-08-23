@@ -5,17 +5,17 @@ import board
 import adafruit_hcsr04
 import RPi.GPIO as GPIO
 
-# Constants
+# Constants in cm
 proximity = 60
 
-frontsonar = adafruit_hcsr04.HCSR04(trigger_pin=board.D15, echo_pin=board.D14)
+rightsonar = adafruit_hcsr04.HCSR04(trigger_pin=board.D15, echo_pin=board.D14)
 backsonar = adafruit_hcsr04.HCSR04(trigger_pin=board.D27, echo_pin=board.D17)
-# leftsonar = adafruit_hcsr04.HCSR04(trigger_pin=board.D23, echo_pin=board.D17)
-# rightsonar = adafruit_hcsr04.HCSR04(trigger_pin=board.D26, echo_pin=board.D19)
+leftsonar = adafruit_hcsr04.HCSR04(trigger_pin=board.D19, echo_pin=board.D13)
+frontsonar = adafruit_hcsr04.HCSR04(trigger_pin=board.D16, echo_pin=board.D26)
 
 
 def tooClose(threshold=proximity):
-    sensors = [frontsonar, backsonar]#, leftsonar]
+    sensors = [frontsonar, backsonar, leftsonar, rightsonar]
     for i, sensor in enumerate(sensors):
         done_reading = False
         while not done_reading:
@@ -26,7 +26,7 @@ def tooClose(threshold=proximity):
                     return True
                 else:
                     done_reading = True
-            except:
+            except RuntimeError:
                 pass
 
     return False
@@ -40,13 +40,34 @@ def tooClose(threshold=proximity):
 
 
 
-# while True:
-#     try:
-#         print("F: ", round(frontsonar.distance, 5))
-#         print("B: ", round(backsonar.distance, 5))
-#         print("L: ", round(leftsonar.distance, 5))
-#         print("R: ", round(rightsonar.distance, 5))
-#         print("-----------------------")
-#     except RuntimeError:
-#         print("Retrying!")
-#     time.sleep(2)
+# try: 
+while True:
+    try:
+        print("F: ", round(frontsonar.distance, 5))
+        print("B: ", round(backsonar.distance, 5))
+        print("L: ", round(leftsonar.distance, 5))
+        print("R: ", round(rightsonar.distance, 5))
+        
+
+    except RuntimeError:
+        print("Retrying!")
+        
+        pass
+
+    except KeyboardInterrupt:
+        GPIO.cleanup()
+        print("KeyboardInterrupt")
+        quit()
+
+    
+    print("-----------------------")
+    time.sleep(1)
+
+
+
+# except KeyboardInterrupt:
+#         GPIO.cleanup()
+#         print("Keyboard Interrupt")
+#         quit()
+
+
