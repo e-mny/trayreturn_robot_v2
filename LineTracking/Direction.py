@@ -7,9 +7,9 @@ from WeightSensor import HX711
 hx = HX711(6, 5, 128)
 
 # Constants
-speed = 1300
+speed = 1000
 timethreshold = 600 # 10 mins
-weightthreshold = 820 # 2 trays
+weightthreshold = 720 # 2 trays
 
 # Hardware SPI configuration:
 SPI_PORT   = 0
@@ -159,9 +159,14 @@ def normal_tracking():
 
 def sensorcheck():
     still()
-    print("Average: ", round(hx.read_average()))
-    return False
-    # return ((hx.read_average() > weightthreshold) or timer())
+    
+    avg = hx.read_average()
+    hx.power_down()
+    time.sleep(.001)
+    hx.power_up()
+    print("Average: ", round(avg))
+    
+    return ((avg > weightthreshold) or timer())
 
 def movement(status):
     new_status = status
@@ -171,6 +176,12 @@ def movement(status):
         print("C1")
         straight()
         time.sleep(1) # Change if change speed
+        while not right90():
+            normal_tracking()
+        straight()
+        time.sleep(1) # Change if change speed
+        new_status = Status.NORMAL
+
         
 
     # C2
@@ -282,3 +293,15 @@ def matches_pattern(pattern):
             return False
 
     return True
+
+
+def setup():
+    """
+    code run once
+    """
+    hx.set_offset(8169755.3125) # Change according to calibration.py
+    hx.set_scale(384.3488095238095) # Change according to calibration.py
+    # Increase scale to decrease reading
+    # Decrease scale to increase reading
+
+setup()

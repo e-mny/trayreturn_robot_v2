@@ -117,9 +117,9 @@ def loop():
 
 ##################################
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    setup()
-    calibrate()
-    while True:
-        loop()
+#     setup()
+#     calibrate()
+#     while True:
+#         loop()
