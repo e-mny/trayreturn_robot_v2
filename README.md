@@ -2,10 +2,10 @@
 
 ## Overview 📙
 
+[Our Blog](https://blogs.ntu.edu.sg/ps9888-2021-g15/)
 This project involves the development of a tray-return robot designed to operate in food courts. 
 The robot autonomously navigates, stops when there are nearby obstacles or people. Patrons may leave their trays on the robot, which will then return trays to the dishwashing station.
 
-[Our Blog](https://blogs.ntu.edu.sg/ps9888-2021-g15/)
 
 ![Demostration of our Tray Return Robot](mnt-gif.gif)
 
