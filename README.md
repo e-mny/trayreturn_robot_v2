@@ -1,6 +1,6 @@
-# Tray Return Robot v2
+# Improved Tray Return Robot
 
-## Overview 📙
+## 📙 Overview 
 
 [Our Blog](https://blogs.ntu.edu.sg/ps9888-2021-g15/)
 
@@ -11,14 +11,14 @@ The robot autonomously navigates, stops when there are nearby obstacles or peopl
 ![Demostration of our Tray Return Robot](mnt-gif.gif)
 
 
-## Features 💯
+## 💯 Features
 
 - **Line Tracking**: The robot follows a predefined path using line tracking sensors.
 - **Weight Sensors**: Determines whether to proceed to the unloading station or continue its loop based on the weight of trays.
 - **Proximity Sensors**: Stops the robot when it detects nearby motion or obstructions to prevent collisions.
 - **Linear Actuators**: Lifts the tray rack to pick up trays and puts them down when unloading.
 
-## Hardware Components 🤖
+## 🤖 Hardware Components 
 
 - **Microcontroller**: Raspberry Pi or any suitable microcontroller.
 - **Line Tracking Sensors**: For following a predefined path.
@@ -29,13 +29,13 @@ The robot autonomously navigates, stops when there are nearby obstacles or peopl
 - **Power Supply**: Batteries or a suitable power source.
 - **Chassis**: The physical structure of the robot.
 
-## Software Components 💻
+## 💻 Software Components 
 
 - **Programming Language**: Python
 - **Development Environment**: Any Python-compatible IDE
 - **Libraries**: RPi.GPIO for GPIO control, other relevant libraries for sensor and actuator integration.
 
-## Installation and Setup 🛠️
+## 🛠️ Installation and Setup 
 
 ### Prerequisites
 
@@ -43,7 +43,7 @@ The robot autonomously navigates, stops when there are nearby obstacles or peopl
 - Python installed on your Raspberry Pi.
 - Basic knowledge of Python programming and hardware integration.
 
-### Steps 📝
+### 📝 Steps 
 
 1. **Clone the Repository**:
     ```sh
@@ -71,5 +71,5 @@ The robot autonomously navigates, stops when there are nearby obstacles or peopl
 
 ## Acknowledgments
 
-- Special thanks to all team members and mentors who contributed to this project.
+- Special thanks to Choo Choo Trayn and mentors who contributed to this project.
 
