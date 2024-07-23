@@ -37,7 +37,7 @@ The robot autonomously navigates, stops when there are nearby obstacles or peopl
 
 ## 🛠️ Installation and Setup 
 
-### Prerequisites
+### 📋 Prerequisites
 
 - A Raspberry Pi or any suitable microcontroller.
 - Python installed on your Raspberry Pi.
@@ -69,7 +69,7 @@ The robot autonomously navigates, stops when there are nearby obstacles or peopl
     python Combine.py
     ```
 
-## Acknowledgments
+## 🙇🏻‍♂️ Acknowledgments
 
 - Special thanks to Choo Choo Trayn and mentors who contributed to this project.
 
